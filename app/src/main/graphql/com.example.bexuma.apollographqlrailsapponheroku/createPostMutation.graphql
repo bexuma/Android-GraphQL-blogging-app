@@ -1,8 +1,7 @@
 mutation createPostMutation (
-  $title: String!,
-  $content: String!
+    $title: String!,
+    $content: String!
 )
-
 {
   createPost (
     title: $title,

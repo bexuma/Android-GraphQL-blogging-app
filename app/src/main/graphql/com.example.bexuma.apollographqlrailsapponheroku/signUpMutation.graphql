@@ -1,4 +1,4 @@
-mutation createUserMutation (
+mutation signUpMutation (
   $name: String!,
   $email: String!,
   $password: String!
@@ -15,5 +15,7 @@ mutation createUserMutation (
   )
   {
     id
+    name
+    email
   }
 }
