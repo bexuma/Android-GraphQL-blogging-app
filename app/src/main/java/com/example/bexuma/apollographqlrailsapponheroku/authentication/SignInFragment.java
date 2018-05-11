@@ -24,54 +24,22 @@ import com.example.bexuma.apollographqlrailsapponheroku.models.User;
 
 import javax.annotation.Nonnull;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link SignInFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+
 public class SignInFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
 
-    private EditText email, password;
-
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
+    private EditText emailEditText, passwordEditText;
+    private String email, password;
+    private ProgressDialog progressDialog;
+    private Button signIn;
 
     public SignInFragment() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment SignInFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static SignInFragment newInstance(String param1, String param2) {
-        SignInFragment fragment = new SignInFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
+
     }
 
     @Override
@@ -79,30 +47,16 @@ public class SignInFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_sign_in, container, false);
-
-        final ProgressDialog progressDialog = new ProgressDialog(MainActivity.getMainActivity());
-
-
-        email = v.findViewById(R.id.editTextEmail);
-        password = v.findViewById(R.id.editTextPassword);
-        Button signIn = v.findViewById(R.id.buttonSignIn);
+        progressDialog = new ProgressDialog(MainActivity.getMainActivity());
+        emailEditText = v.findViewById(R.id.editTextEmail);
+        passwordEditText = v.findViewById(R.id.editTextPassword);
+        signIn = v.findViewById(R.id.buttonSignIn);
         TextView goToSignUp = v.findViewById(R.id.buttonToSignUp);
 
 
         signIn.setOnClickListener(v1 -> {
-            progressDialog.setIndeterminate(true);
-            progressDialog.setMessage("Authenticating...");
-            progressDialog.show();
-
-            new android.os.Handler().postDelayed(
-                    () -> {
-                        login();
-                        progressDialog.dismiss();
-                    }, 3000
-            );
+            login();
         });
-
-
 
         goToSignUp.setOnClickListener(v12 -> MainActivity.getMainActivity().openSignUpFragment());
 
@@ -110,9 +64,41 @@ public class SignInFragment extends Fragment {
     }
 
     public void login() {
+        email = emailEditText.getText().toString();
+        password = passwordEditText.getText().toString();
+
+        if (!isEmailValid(email) || !isPasswordValid(password)) {
+            onLoginFailed();
+            return;
+        }
+
+        signIn.setEnabled(false);
+
+        progressDialog.setIndeterminate(true);
+        progressDialog.setMessage("Authenticating...");
+        progressDialog.show();
+
+        new android.os.Handler().postDelayed(
+                () -> {
+                    authenticate();
+                    progressDialog.dismiss();
+                }, 3000
+        );
+
+    }
+
+    public void onLoginFailed() {
+        Toast.makeText(MainActivity.getMainActivity(), "Login failed", Toast.LENGTH_LONG).show();
+        signIn.setEnabled(true);
+
+    }
+
+    public void authenticate() {
+        signIn.setEnabled(true);
+
         MyApolloClient.getMyApolloClient().mutate(SignInMutation.builder()
-                .email(email.getText().toString())
-                .password(password.getText().toString())
+                .email(email)
+                .password(password)
                 .build())
                 .enqueue(new ApolloCall.Callback<SignInMutation.Data>() {
                     @Override
@@ -152,6 +138,27 @@ public class SignInFragment extends Fragment {
                         });
                     }
                 });
+    }
+
+
+    private boolean isEmailValid(String email) {
+        if (email.contains("@")) {
+            emailEditText.setError(null);
+            return true;
+        } else {
+            emailEditText.setError("enter a valid email address");
+            return false;
+        }
+    }
+
+    private boolean isPasswordValid(String password) {
+        if (password.length() >= 6) {
+            passwordEditText.setError(null);
+            return true;
+        } else {
+            passwordEditText.setError("from 6");
+            return false;
+        }
     }
 
 }
