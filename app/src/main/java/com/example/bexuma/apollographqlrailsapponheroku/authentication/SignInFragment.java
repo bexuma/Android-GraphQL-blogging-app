@@ -55,7 +55,7 @@ public class SignInFragment extends Fragment {
 
 
         signIn.setOnClickListener(v1 -> {
-            login();
+            loginAttempt();
         });
 
         goToSignUp.setOnClickListener(v12 -> MainActivity.getMainActivity().openSignUpFragment());
@@ -63,7 +63,7 @@ public class SignInFragment extends Fragment {
         return v;
     }
 
-    public void login() {
+    public void loginAttempt() {
         email = emailEditText.getText().toString();
         password = passwordEditText.getText().toString();
 
@@ -80,7 +80,8 @@ public class SignInFragment extends Fragment {
 
         new android.os.Handler().postDelayed(
                 () -> {
-                    authenticate();
+                    signIn.setEnabled(true);
+                    authenticate(email, password);
                     progressDialog.dismiss();
                 }, 3000
         );
@@ -93,8 +94,7 @@ public class SignInFragment extends Fragment {
 
     }
 
-    public void authenticate() {
-        signIn.setEnabled(true);
+    public static void authenticate(String email, String password) {
 
         MyApolloClient.getMyApolloClient().mutate(SignInMutation.builder()
                 .email(email)

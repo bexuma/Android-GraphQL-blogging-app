@@ -1,6 +1,7 @@
 package com.example.bexuma.apollographqlrailsapponheroku.authentication;
 
 
+import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -18,59 +19,26 @@ import com.apollographql.apollo.exception.ApolloException;
 import com.example.bexuma.apollographqlrailsapponheroku.MainActivity;
 import com.example.bexuma.apollographqlrailsapponheroku.MyApolloClient;
 import com.example.bexuma.apollographqlrailsapponheroku.R;
-import com.example.bexuma.apollographqlrailsapponheroku.SignInMutation;
 import com.example.bexuma.apollographqlrailsapponheroku.SignUpMutation;
-import com.example.bexuma.apollographqlrailsapponheroku.models.User;
+
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.annotation.Nonnull;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link SignUpFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class SignUpFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
 
-    private EditText name, email, password;
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
+    private EditText nameEditText, emailEditText, passwordEditText;
+    private String name, email, password;
+    private Button signUp;
+    private ProgressDialog progressDialog;
 
     public SignUpFragment() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment SignUpFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static SignUpFragment newInstance(String param1, String param2) {
-        SignUpFragment fragment = new SignUpFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
     }
 
     @Override
@@ -79,17 +47,70 @@ public class SignUpFragment extends Fragment {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_sign_up, container, false);
 
-        name = v.findViewById(R.id.editTextName);
-        email = v.findViewById(R.id.editTextEmail);
-        password = v.findViewById(R.id.editTextPassword);
+        nameEditText = v.findViewById(R.id.editTextName);
+        emailEditText = v.findViewById(R.id.editTextEmail);
+        passwordEditText = v.findViewById(R.id.editTextPassword);
 
-        Button signUp = v.findViewById(R.id.buttonSignUp);
+        signUp = v.findViewById(R.id.buttonSignUp);
         TextView goToSignIn = v.findViewById(R.id.buttonToSignIn);
 
-        signUp.setOnClickListener(v1 -> MyApolloClient.getMyApolloClient().mutate(SignUpMutation.builder()
-                .name(name.getText().toString())
-                .email(email.getText().toString())
-                .password(password.getText().toString())
+        progressDialog = new ProgressDialog(MainActivity.getMainActivity());
+
+
+        signUp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                signUpAttempt();
+
+            }
+        });
+
+
+        goToSignIn.setOnClickListener(v12 -> MainActivity.getMainActivity().openSignInFragment());
+
+
+        return v;
+    }
+
+    public void signUpAttempt() {
+        name = nameEditText.getText().toString();
+        email = emailEditText.getText().toString();
+        password = passwordEditText.getText().toString();
+
+        if (!isEmailValid(email) || !isPasswordValid(password) || !isNameValid(name)) {
+            onSignUpFailed();
+            return;
+        }
+
+        signUp.setEnabled(false);
+
+        progressDialog.setIndeterminate(true);
+        progressDialog.setMessage("Creating new user...");
+        progressDialog.show();
+
+
+        new android.os.Handler().postDelayed(
+                () -> {
+                    signUp.setEnabled(true);
+                    register(name, email, password);
+
+                    progressDialog.dismiss();
+                }, 3000
+        );
+
+    }
+
+    public void onSignUpFailed() {
+        Toast.makeText(MainActivity.getMainActivity(), "Signup failed", Toast.LENGTH_LONG).show();
+        signUp.setEnabled(true);
+
+    }
+
+    public void register(String name, String email, String password) {
+        MyApolloClient.getMyApolloClient().mutate(SignUpMutation.builder()
+                .name(name)
+                .email(email)
+                .password(password)
                 .build())
                 .enqueue(new ApolloCall.Callback<SignUpMutation.Data>() {
                     @Override
@@ -100,10 +121,26 @@ public class SignUpFragment extends Fragment {
 
                             Log.d("SignUpFragmentSU", "onResponse: " + data.createUser());
 
-                            MainActivity.getMainActivity().runOnUiThread(() ->
-                                    Toast.makeText(MainActivity.getMainActivity(), "User was successully created!", Toast.LENGTH_LONG).show());
+                            MainActivity.getMainActivity().runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(MainActivity.getMainActivity(), "User was successully created!", Toast.LENGTH_SHORT).show();
 
-                            signInUser();
+                                    progressDialog.setIndeterminate(true);
+                                    progressDialog.setMessage("Authenticating...");
+                                    progressDialog.show();
+
+                                    new android.os.Handler().postDelayed(
+                                            () -> {
+                                                signUp.setEnabled(true);
+                                                SignInFragment.authenticate(email, password);
+                                                progressDialog.dismiss();
+                                            }, 3000
+                                    );
+
+                                }
+                            });
+
                         }
 
                         else {
@@ -119,48 +156,41 @@ public class SignUpFragment extends Fragment {
                                 Toast.makeText(MainActivity.getMainActivity(), "Something went wrong", Toast.LENGTH_LONG).show());
 
                     }
-                }));
-
-
-
-        goToSignIn.setOnClickListener(v12 -> MainActivity.getMainActivity().openSignInFragment());
-
-
-        return v;
-    }
-
-    public void signInUser() {
-        MyApolloClient.getMyApolloClient().mutate(SignInMutation.builder()
-                .email(email.getText().toString())
-                .password(password.getText().toString())
-                .build())
-                .enqueue(new ApolloCall.Callback<SignInMutation.Data>() {
-                    @Override
-                    public void onResponse(@Nonnull Response<SignInMutation.Data> response) {
-                        SignInMutation.Data data = response.data();
-
-                        if (data.signInUser() != null) {
-
-                            Log.d("SignUpFragmentSI", "onResponse: " + data.signInUser().user());
-
-                            String token = data.signInUser().token();
-                            String name = data.signInUser().user().name();
-                            String email = data.signInUser().user().email();
-
-                            User user = new User(name, email, token);
-
-                            MainActivity.getMainActivity().runOnUiThread(() ->
-                                    Toast.makeText(MainActivity.getMainActivity(), user.getName() + "User authenticated!", Toast.LENGTH_LONG).show());
-
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(@Nonnull ApolloException e) {
-                        Log.d("SignUpFragmentSI", "onResponse: " + e.getLocalizedMessage());
-                        MainActivity.getMainActivity().runOnUiThread(() -> Toast.makeText(MainActivity.getMainActivity(), "Something went wrong", Toast.LENGTH_LONG).show());
-                    }
                 });
     }
+
+    private boolean isNameValid(String name) {
+        if (name.length() >= 4) {
+            nameEditText.setError(null);
+            return true;
+        } else {
+            nameEditText.setError("from 4");
+            return false;
+        }
+    }
+
+    private boolean isEmailValid(String email) {
+        if (email.contains("@")) {
+            emailEditText.setError(null);
+            return true;
+        } else {
+            emailEditText.setError("enter a valid email address");
+            return false;
+        }
+    }
+
+    private boolean isPasswordValid(String password) {
+        if (password.length() >= 6) {
+            passwordEditText.setError(null);
+            return true;
+        } else {
+            passwordEditText.setError("from 6");
+            return false;
+        }
+    }
+
+
+
+
 
 }
