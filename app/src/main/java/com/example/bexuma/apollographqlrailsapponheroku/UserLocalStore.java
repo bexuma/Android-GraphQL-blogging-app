@@ -6,8 +6,8 @@ import android.content.SharedPreferences;
 import com.example.bexuma.apollographqlrailsapponheroku.models.User;
 
 public class UserLocalStore {
-    public static final String SP_NAME = "userDetails";
-    SharedPreferences userLocalDatabase;
+    private static final String SP_NAME = "userDetails";
+    private SharedPreferences userLocalDatabase;
 
     public UserLocalStore(Context context) {
         userLocalDatabase = context.getSharedPreferences(SP_NAME, 0);
@@ -19,7 +19,7 @@ public class UserLocalStore {
         editor.putString("email", user.getEmail());
         editor.putString("token", user.getToken());
 
-        editor.commit();
+        editor.apply();
 
     }
 
@@ -34,21 +34,17 @@ public class UserLocalStore {
     public void setUserLoggedIn(boolean loggedIn) {
         SharedPreferences.Editor editor = userLocalDatabase.edit();
         editor.putBoolean("loggedIn", loggedIn);
-        editor.commit();
+        editor.apply();
     }
 
     public void clearUserData() {
         SharedPreferences.Editor editor = userLocalDatabase.edit();
         editor.clear();
-        editor.commit();
+        editor.apply();
     }
 
     public boolean getUserLoggedIn() {
-        if (userLocalDatabase.getBoolean("loggedIn", false)) {
-            return true;
-        } else {
-            return false;
-        }
+        return userLocalDatabase.getBoolean("loggedIn", false);
     }
 
     public String getUserToken() {

@@ -1,6 +1,9 @@
 package com.example.bexuma.apollographqlrailsapponheroku.fragments;
 
 
+import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.ViewModel;
+import android.arch.lifecycle.ViewModelProvider;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -66,7 +69,7 @@ public class PostsListFragment extends Fragment implements SwipeRefreshLayout.On
 
         });
 
-        Log.d(MyApolloClient.TAG, "Creating apollo activity...");
+        Log.d(MyApolloClient.TAG, "PostsListFragment created");
 
         recyclerView = view.findViewById(R.id.posts_list_recycler);
         recyclerView.setHasFixedSize(true);
@@ -92,7 +95,6 @@ public class PostsListFragment extends Fragment implements SwipeRefreshLayout.On
 
         return view;
     }
-
 
 
     private ApolloCall.Callback<AllPostsQuery.Data> allPostsQueryCallback = new ApolloCall.Callback<AllPostsQuery.Data>() {
@@ -122,8 +124,9 @@ public class PostsListFragment extends Fragment implements SwipeRefreshLayout.On
 
         @Override
         public void onFailure(@Nonnull ApolloException e) {
-            mSwipeRefreshLayout.setRefreshing(false);
             Log.d(MyApolloClient.TAG, "Error:" + e.toString());
+            MainActivity.getMainActivity().runOnUiThread(() ->  mSwipeRefreshLayout.setRefreshing(false));
+
         }
 
     };

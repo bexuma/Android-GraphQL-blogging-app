@@ -18,25 +18,26 @@ import com.example.bexuma.apollographqlrailsapponheroku.fragments.PostsListFragm
 import com.example.bexuma.apollographqlrailsapponheroku.models.Post;
 
 public class MainActivity extends AppCompatActivity {
+    public static final String TAG = "MainActivity";
 
     private static MainActivity mainActivity;
+
+    private static void setMainActivity(MainActivity mainActivity) {
+        MainActivity.mainActivity = mainActivity;
+    }
 
     public static MainActivity getMainActivity() {
         return mainActivity;
     }
 
-    public static void setMainActivity(MainActivity mainActivity) {
-        MainActivity.mainActivity = mainActivity;
-    }
-
     public static UserLocalStore userLocalStore;
-
-    public static final String TAG = "MainActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        Log.d(TAG, "MainActivity created");
 
         MainActivity.setMainActivity(this);
         userLocalStore = new UserLocalStore(this);
