@@ -50,6 +50,7 @@ public class MyApolloClient {
 
         apolloClient = ApolloClient.builder()
                 .serverUrl(BASE_URL)
+                .normalizedCache(cacheFactory, cacheKeyResolver)
                 .okHttpClient(okHttpClient)
                 .build();
 

@@ -2,6 +2,7 @@ package com.example.bexuma.apollographqlrailsapponheroku.fragments;
 
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,9 +23,6 @@ public class PostFragment extends Fragment {
     private String title;
     private String content;
 
-    private TextView titleTextView;
-    private TextView contentTextView;
-
 
     public PostFragment() {
         // Required empty public constructor
@@ -38,7 +36,6 @@ public class PostFragment extends Fragment {
      * @param content Content.
      * @return A new instance of fragment PostFragment.
      */
-    // TODO: Rename and change types and number of parameters
     public static PostFragment newInstance(String title, String content) {
         PostFragment fragment = new PostFragment();
         Bundle args = new Bundle();
@@ -58,11 +55,11 @@ public class PostFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_post, container, false);
-        titleTextView = v.findViewById(R.id.title);
-        contentTextView = v.findViewById(R.id.content);
+        TextView titleTextView = v.findViewById(R.id.title);
+        TextView contentTextView = v.findViewById(R.id.content);
 
         titleTextView.setText(title);
         contentTextView.setText(content);

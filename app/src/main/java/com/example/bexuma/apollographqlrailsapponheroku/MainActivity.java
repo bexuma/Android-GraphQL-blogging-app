@@ -4,22 +4,12 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
-import android.widget.Toast;
 
-import com.apollographql.apollo.ApolloCall;
-import com.apollographql.apollo.api.Response;
-import com.apollographql.apollo.exception.ApolloException;
+import com.example.bexuma.apollographqlrailsapponheroku.authentication.SignInFragment;
+import com.example.bexuma.apollographqlrailsapponheroku.authentication.SignUpFragment;
 import com.example.bexuma.apollographqlrailsapponheroku.fragments.PostFragment;
 import com.example.bexuma.apollographqlrailsapponheroku.fragments.PostsListFragment;
 import com.example.bexuma.apollographqlrailsapponheroku.models.Post;
-import com.example.bexuma.apollographqlrailsapponheroku.models.User;
-
-import javax.annotation.Nonnull;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -52,25 +42,25 @@ public class MainActivity extends AppCompatActivity {
         }
 
     }
-//
-//    public void openSignUpFragment() {
-//        SignUpFragment signUpFragment = new SignUpFragment();
-//        getSupportFragmentManager().beginTransaction()
-//                .replace(R.id.fragmentHolder, signUpFragment)
-//                .addToBackStack(null)
-//                .commit();
-//    }
-//
-//    public void openSignInFragment() {
-//        SignInFragment signInFragment = new SignInFragment();
-//        getSupportFragmentManager().beginTransaction()
-//                .replace(R.id.fragmentHolder, signInFragment)
-//                .addToBackStack(null)
-//                .commit();
-//    }
 
-    public void openPostFragment(String title, String content) {
-        PostFragment postFragment = PostFragment.newInstance(title, content);
+    public void openSignUpFragment() {
+        SignUpFragment signUpFragment = new SignUpFragment();
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragmentHolder, signUpFragment)
+                .addToBackStack(null)
+                .commit();
+    }
+
+    public void openSignInFragment() {
+        SignInFragment signInFragment = new SignInFragment();
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragmentHolder, signInFragment)
+                .addToBackStack(null)
+                .commit();
+    }
+
+    public void openPostFragment(Post post) {
+        PostFragment postFragment = PostFragment.newInstance(post.getTitle(), post.getContent());
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragmentHolder, postFragment)
                 .addToBackStack(null)
