@@ -25,9 +25,6 @@ public class PostsViewHolder extends RecyclerView.ViewHolder {
         titleTextView.setText(post.getTitle());
         contentTextView.setText(post.getContent());
 
-        postEntryContainer.setOnClickListener(v ->
-                MainActivity.getMainActivity().openPostFragment(post));
-
     }
 
 }

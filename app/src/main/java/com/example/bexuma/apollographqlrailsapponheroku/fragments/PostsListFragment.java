@@ -4,13 +4,13 @@ package com.example.bexuma.apollographqlrailsapponheroku.fragments;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ProgressBar;
 
 import com.apollographql.apollo.ApolloCall;
 import com.apollographql.apollo.ApolloClient;
@@ -29,14 +29,15 @@ import java.util.ArrayList;
 import javax.annotation.Nonnull;
 
 
-public class PostsListFragment extends Fragment {
+public class PostsListFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
 
-    private ArrayList<Post> postList = new ArrayList<>();
+    private ArrayList<Post> postList;
 
-    ApolloClient myApolloClient;
-    ViewGroup content;
-    ProgressBar progressBar;
-    PostsAdapter adapter;
+    private final ApolloClient myApolloClient = MyApolloClient.getMyApolloClient();
+
+    SwipeRefreshLayout mSwipeRefreshLayout;
+    private RecyclerView recyclerView;
+    private PostsAdapter adapter;
 
     public PostsListFragment() {
         // Required empty public constructor
@@ -54,22 +55,29 @@ public class PostsListFragment extends Fragment {
 
         Log.d(MyApolloClient.TAG, "Creating apollo activity...");
 
-        myApolloClient = MyApolloClient.getMyApolloClient();
-
-        content = view.findViewById(R.id.posts_holder);
-        progressBar = view.findViewById(R.id.loading_bar);
-
-        RecyclerView recyclerView = view.findViewById(R.id.posts_list_recycler);
+        recyclerView = view.findViewById(R.id.posts_list_recycler);
         recyclerView.setHasFixedSize(true);
 
-        adapter = new PostsAdapter(postList);
-        recyclerView.setAdapter(adapter);
-
-        LinearLayoutManager layoutManager = new LinearLayoutManager(MainActivity.getMainActivity());
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(layoutManager);
 
-        fetchPosts();
+        postList = new ArrayList<>();
+
+        mSwipeRefreshLayout = view.findViewById(R.id.swipe_container);
+        mSwipeRefreshLayout.setOnRefreshListener(this);
+        mSwipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary,
+                android.R.color.holo_green_dark,
+                android.R.color.holo_orange_dark,
+                android.R.color.holo_blue_dark);
+
+        mSwipeRefreshLayout.post(() -> {
+            mSwipeRefreshLayout.setRefreshing(true);
+            fetchPosts();
+        });
+
+
+
         return view;
     }
 
@@ -88,26 +96,42 @@ public class PostsListFragment extends Fragment {
                     postList.add(post);
                 }
 
-                progressBar.setVisibility(View.GONE);
-                content.setVisibility(View.VISIBLE);
+                adapter = new PostsAdapter(postList);
+                recyclerView.setAdapter(adapter);
                 adapter.notifyDataSetChanged();
+                mSwipeRefreshLayout.setRefreshing(false);
+
+
             });
 
         }
 
         @Override
         public void onFailure(@Nonnull ApolloException e) {
+            mSwipeRefreshLayout.setRefreshing(false);
             Log.d(MyApolloClient.TAG, "Error:" + e.toString());
         }
+
     };
+
+    @Override
+    public void onRefresh() {
+        postList.clear();
+        fetchPosts();
+
+    }
 
     private void fetchPosts() {
         Log.d(MyApolloClient.TAG, "Fetch posts ....");
+        mSwipeRefreshLayout.setRefreshing(true);
         myApolloClient.query(
                 AllPostsQuery.builder()
                         .build()
         ).httpCachePolicy(HttpCachePolicy.CACHE_FIRST)
                 .enqueue(allPostsQueryCallback);
     }
+
+
+
 
 }

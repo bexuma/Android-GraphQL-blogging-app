@@ -1,41 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--<android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"-->
-    <!--xmlns:app="http://schemas.android.com/apk/res-auto"-->
-    <!--xmlns:tools="http://schemas.android.com/tools"-->
-    <!--android:id="@+id/list"-->
-    <!--android:name="com.example.bexuma.apollographqlrailsapponheroku.fragments.PostFragment"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="match_parent"-->
-    <!--android:layout_marginLeft="16dp"-->
-    <!--android:layout_marginRight="16dp"-->
-    <!--tools:context=".fragments.PostFragment"-->
-    <!--tools:listitem="@layout/fragment_post" />-->
-
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
 xmlns:tools="http://schemas.android.com/tools"
 android:layout_width="match_parent"
 android:layout_height="match_parent"
 tools:context="com.example.bexuma.apollographqlrailsapponheroku.fragments.PostsListFragment">
 
-    <ProgressBar
-        android:id="@+id/loading_bar"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_gravity="center"
-        />
 
-    <RelativeLayout
-        android:id="@+id/posts_holder"
+
+    <android.support.v4.widget.SwipeRefreshLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/swipe_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:paddingBottom="10dp"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp"
-        android:paddingTop="10dp"
-        >
+        android:layout_height="match_parent">
 
         <include layout="@layout/posts_recycler" />
 
-    </RelativeLayout>
+    </android.support.v4.widget.SwipeRefreshLayout>
+
 
 </FrameLayout>

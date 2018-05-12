@@ -1,8 +1,5 @@
 package com.example.bexuma.apollographqlrailsapponheroku;
 
-import android.app.Application;
-import android.content.Context;
-
 import com.apollographql.apollo.ApolloClient;
 import com.apollographql.apollo.api.Operation;
 import com.apollographql.apollo.api.ResponseField;
@@ -50,7 +47,7 @@ public class MyApolloClient {
 
         apolloClient = ApolloClient.builder()
                 .serverUrl(BASE_URL)
-                .normalizedCache(cacheFactory, cacheKeyResolver)
+//                .normalizedCache(cacheFactory, cacheKeyResolver)
                 .okHttpClient(okHttpClient)
                 .build();
 
