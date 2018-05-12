@@ -17,6 +17,25 @@ android:layout_width="match_parent"
 android:layout_height="match_parent"
 tools:context="com.example.bexuma.apollographqlrailsapponheroku.fragments.PostsListFragment">
 
-<include layout="@layout/posts_recycler" />
+    <ProgressBar
+        android:id="@+id/loading_bar"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_gravity="center"
+        />
+
+    <RelativeLayout
+        android:id="@+id/posts_holder"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingBottom="10dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:paddingTop="10dp"
+        >
+
+        <include layout="@layout/posts_recycler" />
+
+    </RelativeLayout>
 
 </FrameLayout>
