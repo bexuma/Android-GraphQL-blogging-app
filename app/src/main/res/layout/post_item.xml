@@ -5,7 +5,7 @@
     android:layout_marginBottom="30dp">
 
     <TextView
-        android:id="@+id/title"
+        android:id="@+id/post_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/text_margin"
@@ -13,7 +13,7 @@
         android:textAppearance="?attr/textAppearanceListItem" />
 
     <TextView
-        android:id="@+id/content"
+        android:id="@+id/post_content"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="14sp"
