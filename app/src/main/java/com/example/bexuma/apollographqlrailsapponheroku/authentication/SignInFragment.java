@@ -2,6 +2,7 @@ package com.example.bexuma.apollographqlrailsapponheroku.authentication;
 
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -9,6 +10,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -32,7 +34,7 @@ public class SignInFragment extends Fragment {
 
     private EditText emailEditText, passwordEditText;
     private String email, password;
-    private ProgressDialog progressDialog;
+    private static ProgressDialog progressDialog;
     private Button signIn;
 
     public SignInFragment() {
@@ -83,7 +85,6 @@ public class SignInFragment extends Fragment {
                 () -> {
                     signIn.setEnabled(true);
                     authenticate(email, password);
-                    progressDialog.dismiss();
                 }, 3000
         );
 
@@ -108,6 +109,8 @@ public class SignInFragment extends Fragment {
 
                         assert data != null;
                         if (data.signInUser() != null) {
+                            // Check if no view has focus:
+
 
                             Log.d("MainActivity", "onResponse: " + data.signInUser().user());
 
@@ -117,15 +120,22 @@ public class SignInFragment extends Fragment {
 
                             User user = new User(name, email, token);
 
+                            User.setSignedIn(true);
+
                             MainActivity.getMainActivity().openPostsListFragment();
 
-                            MainActivity.getMainActivity().runOnUiThread(() ->
-                                    Toast.makeText(MainActivity.getMainActivity(), user.getName() + "User authenticated!", Toast.LENGTH_LONG).show());
+                            MainActivity.getMainActivity().runOnUiThread(() -> {
+                                progressDialog.dismiss();
+
+                                Toast.makeText(MainActivity.getMainActivity(), user.getName() + "User authenticated!", Toast.LENGTH_LONG).show();
+                            });
                         }
 
                         else {
-                            MainActivity.getMainActivity().runOnUiThread(() ->
-                                    Toast.makeText(MainActivity.getMainActivity(), "Wrong email or password", Toast.LENGTH_LONG).show());
+                            MainActivity.getMainActivity().runOnUiThread(() -> {
+                                progressDialog.dismiss();
+                                Toast.makeText(MainActivity.getMainActivity(), "Wrong email or password", Toast.LENGTH_LONG).show();
+                            });
                         }
 
                     }
@@ -133,7 +143,10 @@ public class SignInFragment extends Fragment {
                     @Override
                     public void onFailure(@Nonnull ApolloException e) {
                         Log.d("MainActivity", "onResponse: " + e.getLocalizedMessage());
-                        MainActivity.getMainActivity().runOnUiThread(() -> Toast.makeText(MainActivity.getMainActivity(), "Something went wrong", Toast.LENGTH_LONG).show());
+                        MainActivity.getMainActivity().runOnUiThread(() ->  {
+                            progressDialog.dismiss();
+                            Toast.makeText(MainActivity.getMainActivity(), "Something went wrong", Toast.LENGTH_LONG).show();
+                        });
                     }
                 });
     }

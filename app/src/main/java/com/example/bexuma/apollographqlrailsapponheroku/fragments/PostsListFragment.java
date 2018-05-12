@@ -1,8 +1,11 @@
 package com.example.bexuma.apollographqlrailsapponheroku.fragments;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
@@ -18,6 +21,7 @@ import com.apollographql.apollo.api.Response;
 import com.apollographql.apollo.api.cache.http.HttpCachePolicy;
 import com.apollographql.apollo.exception.ApolloException;
 import com.example.bexuma.apollographqlrailsapponheroku.AllPostsQuery;
+import com.example.bexuma.apollographqlrailsapponheroku.CreatePostActivity;
 import com.example.bexuma.apollographqlrailsapponheroku.MainActivity;
 import com.example.bexuma.apollographqlrailsapponheroku.MyApolloClient;
 import com.example.bexuma.apollographqlrailsapponheroku.R;
@@ -32,8 +36,6 @@ import javax.annotation.Nonnull;
 public class PostsListFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
 
     private ArrayList<Post> postList;
-
-    private final ApolloClient myApolloClient = MyApolloClient.getMyApolloClient();
 
     SwipeRefreshLayout mSwipeRefreshLayout;
     private RecyclerView recyclerView;
@@ -52,6 +54,13 @@ public class PostsListFragment extends Fragment implements SwipeRefreshLayout.On
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_post_list, container, false);
+
+        FloatingActionButton fab = view.findViewById(R.id.fab);
+
+        fab.setOnClickListener(view1 -> {
+                Intent myIntent = new Intent(MainActivity.getMainActivity(), CreatePostActivity.class);
+                MainActivity.getMainActivity().startActivity(myIntent);
+        });
 
         Log.d(MyApolloClient.TAG, "Creating apollo activity...");
 
@@ -124,11 +133,10 @@ public class PostsListFragment extends Fragment implements SwipeRefreshLayout.On
     private void fetchPosts() {
         Log.d(MyApolloClient.TAG, "Fetch posts ....");
         mSwipeRefreshLayout.setRefreshing(true);
-        myApolloClient.query(
+        MyApolloClient.getMyApolloClient().query(
                 AllPostsQuery.builder()
                         .build()
-        ).httpCachePolicy(HttpCachePolicy.CACHE_FIRST)
-                .enqueue(allPostsQueryCallback);
+        ).enqueue(allPostsQueryCallback);
     }
 
 

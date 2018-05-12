@@ -2,9 +2,18 @@ package com.example.bexuma.apollographqlrailsapponheroku.models;
 
 public class User {
 
+    public static boolean isSignedIn() {
+        return signedIn;
+    }
+
+    public static void setSignedIn(boolean signedIn) {
+        User.signedIn = signedIn;
+    }
+
+    public static boolean signedIn = false;
+    private static String token;
     private String name;
     private String email;
-    private String token;
 
     public User(String name, String email, String token) {
         this.name = name;
@@ -20,7 +29,7 @@ public class User {
         return email;
     }
 
-    public String getToken() {
+    public static String getToken() {
         return token;
     }
 
