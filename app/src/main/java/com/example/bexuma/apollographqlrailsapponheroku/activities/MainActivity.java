@@ -5,6 +5,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -30,6 +31,8 @@ public class MainActivity extends AppCompatActivity {
 
     public static UserLocalStore userLocalStore;
 
+    public static final String TAG = "MainActivity";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+
     public void openPostFragment(Post post) {
         PostFragment postFragment = PostFragment.newInstance(post.getTitle(), post.getContent());
         getSupportFragmentManager().beginTransaction()
@@ -56,6 +60,8 @@ public class MainActivity extends AppCompatActivity {
                 .addToBackStack(null)
                 .commit();
     }
+
+
 
     public void openPostsListFragment() {
         PostsListFragment postsListFragment = new PostsListFragment();
@@ -93,6 +99,8 @@ public class MainActivity extends AppCompatActivity {
     public void logout() {
         userLocalStore.clearUserData();
         userLocalStore.setUserLoggedIn(false);
+
+        Log.d(TAG, "Token! " + MainActivity.userLocalStore.getUserToken());
 
         Intent startEntryActivity = new Intent(this, EntryActivity.class);
 

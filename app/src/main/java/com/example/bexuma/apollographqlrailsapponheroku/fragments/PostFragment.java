@@ -32,7 +32,7 @@ public class PostFragment extends Fragment {
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @param title Title.
+     * @param title   Title.
      * @param content Content.
      * @return A new instance of fragment PostFragment.
      */

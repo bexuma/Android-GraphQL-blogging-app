@@ -26,7 +26,7 @@ public class UserLocalStore {
     public User getLoggedInUser() {
         String name = userLocalDatabase.getString("name", "");
         String email = userLocalDatabase.getString("email", "");
-        String token = userLocalDatabase.getString("token", "");
+        String token = userLocalDatabase.getString("token", null);
 
         return new User(name, email, token);
     }
@@ -52,6 +52,6 @@ public class UserLocalStore {
     }
 
     public String getUserToken() {
-        return userLocalDatabase.getString("token", "");
+        return userLocalDatabase.getString("token", null);
     }
 }

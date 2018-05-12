@@ -21,6 +21,7 @@ import com.example.bexuma.apollographqlrailsapponheroku.activities.EntryActivity
 import com.example.bexuma.apollographqlrailsapponheroku.MyApolloClient;
 import com.example.bexuma.apollographqlrailsapponheroku.R;
 import com.example.bexuma.apollographqlrailsapponheroku.SignUpMutation;
+import com.example.bexuma.apollographqlrailsapponheroku.activities.MainActivity;
 
 import javax.annotation.Nonnull;
 
@@ -99,7 +100,7 @@ public class SignUpFragment extends Fragment {
     }
 
     public void register(String name, String email, String password) {
-        MyApolloClient.getMyApolloClient().mutate(SignUpMutation.builder()
+        MyApolloClient.getMyApolloClient(MainActivity.userLocalStore.getUserToken()).mutate(SignUpMutation.builder()
                 .name(name)
                 .email(email)
                 .password(password)

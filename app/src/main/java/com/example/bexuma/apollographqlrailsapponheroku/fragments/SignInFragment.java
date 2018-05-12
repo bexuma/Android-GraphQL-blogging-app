@@ -102,7 +102,7 @@ public class SignInFragment extends Fragment {
 
 
     public static void authenticate(String email, String password) {
-        MyApolloClient.getMyApolloClient().mutate(SignInMutation.builder()
+        MyApolloClient.getMyApolloClient(MainActivity.userLocalStore.getUserToken()).mutate(SignInMutation.builder()
                 .email(email)
                 .password(password)
                 .build())

@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
@@ -16,13 +15,13 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.apollographql.apollo.ApolloCall;
-import com.apollographql.apollo.ApolloClient;
 import com.apollographql.apollo.api.Response;
-import com.apollographql.apollo.api.cache.http.HttpCachePolicy;
 import com.apollographql.apollo.exception.ApolloException;
 import com.example.bexuma.apollographqlrailsapponheroku.AllPostsQuery;
-import com.example.bexuma.apollographqlrailsapponheroku.CreatePostActivity;
-import com.example.bexuma.apollographqlrailsapponheroku.MainActivity;
+import com.example.bexuma.apollographqlrailsapponheroku.UserLocalStore;
+import com.example.bexuma.apollographqlrailsapponheroku.activities.CreatePostActivity;
+import com.example.bexuma.apollographqlrailsapponheroku.activities.EntryActivity;
+import com.example.bexuma.apollographqlrailsapponheroku.activities.MainActivity;
 import com.example.bexuma.apollographqlrailsapponheroku.MyApolloClient;
 import com.example.bexuma.apollographqlrailsapponheroku.R;
 import com.example.bexuma.apollographqlrailsapponheroku.adapters.PostsAdapter;
@@ -40,6 +39,7 @@ public class PostsListFragment extends Fragment implements SwipeRefreshLayout.On
     SwipeRefreshLayout mSwipeRefreshLayout;
     private RecyclerView recyclerView;
     private PostsAdapter adapter;
+    UserLocalStore userLocalStore;
 
     public PostsListFragment() {
         // Required empty public constructor
@@ -57,9 +57,13 @@ public class PostsListFragment extends Fragment implements SwipeRefreshLayout.On
 
         FloatingActionButton fab = view.findViewById(R.id.fab);
 
+        userLocalStore = new UserLocalStore(EntryActivity.getEntryActivity());
+
         fab.setOnClickListener(view1 -> {
-                Intent myIntent = new Intent(MainActivity.getMainActivity(), CreatePostActivity.class);
-                MainActivity.getMainActivity().startActivity(myIntent);
+            Intent myIntent = new Intent(MainActivity.getMainActivity(), CreatePostActivity.class);
+            MainActivity.getMainActivity().startActivity(myIntent);
+
+
         });
 
         Log.d(MyApolloClient.TAG, "Creating apollo activity...");
@@ -86,9 +90,10 @@ public class PostsListFragment extends Fragment implements SwipeRefreshLayout.On
         });
 
 
-
         return view;
     }
+
+
 
     private ApolloCall.Callback<AllPostsQuery.Data> allPostsQueryCallback = new ApolloCall.Callback<AllPostsQuery.Data>() {
         @Override
@@ -133,13 +138,11 @@ public class PostsListFragment extends Fragment implements SwipeRefreshLayout.On
     private void fetchPosts() {
         Log.d(MyApolloClient.TAG, "Fetch posts ....");
         mSwipeRefreshLayout.setRefreshing(true);
-        MyApolloClient.getMyApolloClient().query(
+        MyApolloClient.getMyApolloClient(MainActivity.userLocalStore.getUserToken()).query(
                 AllPostsQuery.builder()
                         .build()
         ).enqueue(allPostsQueryCallback);
     }
-
-
 
 
 }

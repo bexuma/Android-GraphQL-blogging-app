@@ -22,12 +22,23 @@ public class MyApolloClient {
     private static final String BASE_URL = "https://graphql-example-blog.herokuapp.com/graphql";
     public static final String TAG = "MyServer";
 
-    private static ApolloClient apolloClient;
 
-
-    public static ApolloClient getMyApolloClient() {
-        OkHttpClient okHttpClient = new OkHttpClient.Builder()
-                .build();
+    public static ApolloClient getMyApolloClient(String token) {
+        Log.d(TAG, "Token!: " + token);
+        OkHttpClient okHttpClient;
+        if (token == null) {
+            okHttpClient = new OkHttpClient.Builder()
+                    .build();
+        } else {
+            okHttpClient = new OkHttpClient.Builder()
+                    .addInterceptor(chain -> {
+                        Request original = chain.request();
+                        Request.Builder builder = original.newBuilder().method(original.method(), original.body());
+                        builder.addHeader("Authorization", "bearer " + token);
+                        return chain.proceed(builder.build());
+                    })
+                    .build();
+        }
 
         NormalizedCacheFactory cacheFactory = new LruNormalizedCacheFactory(EvictionPolicy.builder().maxSizeBytes(10 * 1024).build());
         CacheKeyResolver cacheKeyResolver = new CacheKeyResolver() {
@@ -48,32 +59,31 @@ public class MyApolloClient {
             }
         };
 
-        apolloClient = ApolloClient.builder()
+
+        return ApolloClient.builder()
                 .serverUrl(BASE_URL)
                 .normalizedCache(cacheFactory, cacheKeyResolver)
                 .okHttpClient(okHttpClient)
                 .build();
-
-        return apolloClient;
     }
 
-    public static ApolloClient getAuthorizedApolloClient(String token) {
-        Log.d(TAG, "Token!: " + token);
-        OkHttpClient okHttpClient = new OkHttpClient.Builder()
-                .addInterceptor(chain -> {
-                    Request original = chain.request();
-                    Request.Builder builder = original.newBuilder().method(original.method(), original.body());
-                    builder.addHeader("Authorization", "bearer " + token);
-                    return chain.proceed(builder.build());
-                })
-                .build();
-
-        apolloClient = ApolloClient.builder()
-                .serverUrl(BASE_URL)
-                .okHttpClient(okHttpClient)
-                .build();
-
-        return apolloClient;
-
-    }
+//    public static ApolloClient getAuthorizedApolloClient(String token) {
+//        Log.d(TAG, "Token!: " + token);
+//        OkHttpClient okHttpClient = new OkHttpClient.Builder()
+//                .addInterceptor(chain -> {
+//                    Request original = chain.request();
+//                    Request.Builder builder = original.newBuilder().method(original.method(), original.body());
+//                    builder.addHeader("Authorization", "bearer " + token);
+//                    return chain.proceed(builder.build());
+//                })
+//                .build();
+//
+//        apolloClient = ApolloClient.builder()
+//                .serverUrl(BASE_URL)
+//                .okHttpClient(okHttpClient)
+//                .build();
+//
+//        return apolloClient;
+//
+//    }
 }

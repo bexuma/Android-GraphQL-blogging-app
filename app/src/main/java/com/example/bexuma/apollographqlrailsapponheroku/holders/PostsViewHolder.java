@@ -4,7 +4,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.TextView;
 
-import com.example.bexuma.apollographqlrailsapponheroku.MainActivity;
 import com.example.bexuma.apollographqlrailsapponheroku.R;
 import com.example.bexuma.apollographqlrailsapponheroku.models.Post;
 

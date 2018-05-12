@@ -78,7 +78,7 @@ public class CreatePostActivity extends AppCompatActivity {
 
     private void createPost(String title, String content) {
 
-        MyApolloClient.getAuthorizedApolloClient(MainActivity.userLocalStore.getUserToken()).mutate(CreatePostMutation.builder()
+        MyApolloClient.getMyApolloClient(MainActivity.userLocalStore.getUserToken()).mutate(CreatePostMutation.builder()
                 .title(title)
                 .content(content)
                 .build()).enqueue(createPostMutationCallback);
