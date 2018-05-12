@@ -16,6 +16,9 @@ import com.apollographql.apollo.api.Response;
 import com.apollographql.apollo.exception.ApolloException;
 import com.example.bexuma.apollographqlrailsapponheroku.authentication.SignInFragment;
 import com.example.bexuma.apollographqlrailsapponheroku.authentication.SignUpFragment;
+import com.example.bexuma.apollographqlrailsapponheroku.fragments.PostFragment;
+import com.example.bexuma.apollographqlrailsapponheroku.fragments.PostsListFragment;
+import com.example.bexuma.apollographqlrailsapponheroku.models.Post;
 import com.example.bexuma.apollographqlrailsapponheroku.models.User;
 
 import javax.annotation.Nonnull;
@@ -44,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
         Fragment fragmentHolder = fragmentManager.findFragmentById(R.id.fragmentHolder);
 
         if (fragmentHolder == null) {
-            fragmentHolder = new SignInFragment();
+            fragmentHolder = new PostsListFragment();
             fragmentManager.beginTransaction()
                     .add(R.id.fragmentHolder, fragmentHolder)
                     .commit();
@@ -64,6 +67,22 @@ public class MainActivity extends AppCompatActivity {
         SignInFragment signInFragment = new SignInFragment();
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragmentHolder, signInFragment)
+                .addToBackStack(null)
+                .commit();
+    }
+
+    public void openPostFragment(Post selectedPost) {
+        PostFragment postFragment = PostFragment.newInstance(selectedPost.getTitle(), selectedPost.getContent());
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragmentHolder, postFragment)
+                .addToBackStack(null)
+                .commit();
+    }
+
+    public void openPostsListFragment() {
+        PostsListFragment postsListFragment = new PostsListFragment();
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragmentHolder, postsListFragment)
                 .addToBackStack(null)
                 .commit();
     }

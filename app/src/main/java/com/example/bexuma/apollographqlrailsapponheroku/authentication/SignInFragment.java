@@ -115,6 +115,8 @@ public class SignInFragment extends Fragment {
 
                             User user = new User(name, email, token);
 
+                            MainActivity.getMainActivity().openPostsListFragment();
+
                             MainActivity.getMainActivity().runOnUiThread(() ->
                                     Toast.makeText(MainActivity.getMainActivity(), user.getName() + "User authenticated!", Toast.LENGTH_LONG).show());
                         }
