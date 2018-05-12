@@ -1,5 +1,7 @@
 package com.example.bexuma.apollographqlrailsapponheroku;
 
+import android.util.Log;
+
 import com.apollographql.apollo.ApolloClient;
 import com.apollographql.apollo.api.Operation;
 import com.apollographql.apollo.api.ResponseField;
@@ -39,7 +41,8 @@ public class MyApolloClient {
                 return CacheKey.NO_KEY;
             }
 
-            @Nonnull @Override
+            @Nonnull
+            @Override
             public CacheKey fromFieldArguments(@Nonnull ResponseField field, @Nonnull Operation.Variables variables) {
                 return CacheKey.NO_KEY;
             }
@@ -47,7 +50,7 @@ public class MyApolloClient {
 
         apolloClient = ApolloClient.builder()
                 .serverUrl(BASE_URL)
-//                .normalizedCache(cacheFactory, cacheKeyResolver)
+                .normalizedCache(cacheFactory, cacheKeyResolver)
                 .okHttpClient(okHttpClient)
                 .build();
 
@@ -55,6 +58,7 @@ public class MyApolloClient {
     }
 
     public static ApolloClient getAuthorizedApolloClient(String token) {
+        Log.d(TAG, "Token!: " + token);
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
                 .addInterceptor(chain -> {
                     Request original = chain.request();
