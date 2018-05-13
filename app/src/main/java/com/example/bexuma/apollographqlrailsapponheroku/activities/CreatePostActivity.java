@@ -61,8 +61,8 @@ public class CreatePostActivity extends AppCompatActivity {
             if (data.createPost() != null) {
                 Log.d("CreatePostActivity", "onResponse: " + data.createPost());
                 CreatePostActivity.this.runOnUiThread(() -> {
-                    Intent myIntent = new Intent(CreatePostActivity.this, MainActivity.class);
-                    CreatePostActivity.this.startActivity(myIntent);
+//                    Intent myIntent = new Intent(CreatePostActivity.this, MainActivity.class);
+//                    CreatePostActivity.this.startActivity(myIntent);
                     MainActivity.getMainActivity().openPostsListFragment();
                     Toast.makeText(MainActivity.getMainActivity(), "Post was successfully created!", Toast.LENGTH_LONG).show();
                 });
