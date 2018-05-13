@@ -1,9 +1,6 @@
 package com.example.bexuma.apollographqlrailsapponheroku.fragments;
 
 
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.ViewModel;
-import android.arch.lifecycle.ViewModelProvider;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -37,11 +34,13 @@ import javax.annotation.Nonnull;
 
 public class PostsListFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
 
-    private ArrayList<Post> postList;
+    private static final String SAVED_POSTS = "Saved Posts";
+    private static final String TAG = PostsListFragment.class.getSimpleName();
+    private ArrayList<Post> postArrayList;
 
     SwipeRefreshLayout mSwipeRefreshLayout;
-    private RecyclerView recyclerView;
-    private PostsAdapter adapter;
+    private RecyclerView mRecyclerView;
+    private PostsAdapter mRecyclerAdapter;
     UserLocalStore userLocalStore;
 
     public PostsListFragment() {
@@ -56,6 +55,7 @@ public class PostsListFragment extends Fragment implements SwipeRefreshLayout.On
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        super.onCreateView(inflater, container, savedInstanceState);
         View view = inflater.inflate(R.layout.fragment_post_list, container, false);
 
         FloatingActionButton fab = view.findViewById(R.id.fab);
@@ -66,19 +66,31 @@ public class PostsListFragment extends Fragment implements SwipeRefreshLayout.On
             Intent myIntent = new Intent(MainActivity.getMainActivity(), CreatePostActivity.class);
             MainActivity.getMainActivity().startActivity(myIntent);
 
-
         });
 
-        Log.d(MyApolloClient.TAG, "PostsListFragment created");
+        Log.d(TAG, "PostsListFragment created");
 
-        recyclerView = view.findViewById(R.id.posts_list_recycler);
-        recyclerView.setHasFixedSize(true);
+        mRecyclerView = view.findViewById(R.id.posts_list_recycler);
+        mRecyclerView.setHasFixedSize(true);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-        recyclerView.setLayoutManager(layoutManager);
+        mRecyclerView.setLayoutManager(layoutManager);
 
-        postList = new ArrayList<>();
+        mRecyclerView.setAdapter(new PostsAdapter(new ArrayList<Post>()));
+
+        if (savedInstanceState != null) {
+            postArrayList = savedInstanceState.getParcelableArrayList(SAVED_POSTS);
+            if (mRecyclerAdapter == null) {
+                initializeAdapter();
+                Log.d(TAG, "Adapter was initialized, because was null, but had been bundled.");
+            } else {
+                mRecyclerAdapter.notifyDataSetChanged();
+                Log.d(TAG, "Adapter data set was changed, and had been bundled..");
+            }
+        }
+
+
 
         mSwipeRefreshLayout = view.findViewById(R.id.swipe_container);
         mSwipeRefreshLayout.setOnRefreshListener(this);
@@ -87,13 +99,20 @@ public class PostsListFragment extends Fragment implements SwipeRefreshLayout.On
                 android.R.color.holo_orange_dark,
                 android.R.color.holo_blue_dark);
 
-        mSwipeRefreshLayout.post(() -> {
-            mSwipeRefreshLayout.setRefreshing(true);
-            fetchPosts();
-        });
 
+        if (postArrayList == null || postArrayList.size() == 0) {
+            fetchPosts();
+        } else {
+            Log.d(TAG, "Initialize adapter HA ....");
+            initializeAdapter();
+        }
 
         return view;
+    }
+
+    private void initializeAdapter() {
+        mRecyclerAdapter = new PostsAdapter(postArrayList);
+        mRecyclerView.setAdapter(mRecyclerAdapter);
     }
 
 
@@ -103,20 +122,29 @@ public class PostsListFragment extends Fragment implements SwipeRefreshLayout.On
             AllPostsQuery.Data data = dataResponse.data();
 
             assert data != null;
-            Log.d(MyApolloClient.TAG, "Received posts: " + data.allPosts().size());
+            Log.d(TAG, "Received posts: " + data.allPosts().size());
 
             MainActivity.getMainActivity().runOnUiThread(() -> {
+                postArrayList.clear();
+
+                ArrayList<Post> new_posts = new ArrayList<>();
 
                 for (int i = 0; i < data.allPosts().size(); i++) {
                     Post post = new Post(data.allPosts().get(i).title(), data.allPosts().get(i).content());
-                    postList.add(post);
+                    new_posts.add(post);
                 }
 
-                adapter = new PostsAdapter(postList);
-                recyclerView.setAdapter(adapter);
-                adapter.notifyDataSetChanged();
-                mSwipeRefreshLayout.setRefreshing(false);
+                postArrayList.addAll(new_posts);
 
+                if (mRecyclerAdapter == null) {
+                    initializeAdapter();
+                    Log.d(TAG, "Adapter was initialized, because was null.");
+                }
+                else {
+                    mRecyclerAdapter.notifyDataSetChanged();
+                    Log.d(TAG, "Adapter data set was changed.");
+                }
+                mSwipeRefreshLayout.setRefreshing(false);
 
             });
 
@@ -124,7 +152,7 @@ public class PostsListFragment extends Fragment implements SwipeRefreshLayout.On
 
         @Override
         public void onFailure(@Nonnull ApolloException e) {
-            Log.d(MyApolloClient.TAG, "Error:" + e.toString());
+            Log.d(TAG, "Error:" + e.toString());
             MainActivity.getMainActivity().runOnUiThread(() ->  mSwipeRefreshLayout.setRefreshing(false));
 
         }
@@ -133,18 +161,28 @@ public class PostsListFragment extends Fragment implements SwipeRefreshLayout.On
 
     @Override
     public void onRefresh() {
-        postList.clear();
+        Log.d(TAG, "Fetch posts ....");
         fetchPosts();
-
     }
 
     private void fetchPosts() {
-        Log.d(MyApolloClient.TAG, "Fetch posts ....");
+        if (postArrayList == null) {
+            postArrayList = new ArrayList<>();
+        }
         mSwipeRefreshLayout.setRefreshing(true);
+
         MyApolloClient.getMyApolloClient(MainActivity.userLocalStore.getUserToken()).query(
                 AllPostsQuery.builder()
                         .build()
         ).enqueue(allPostsQueryCallback);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        if (postArrayList != null) {
+            outState.putParcelableArrayList(SAVED_POSTS, postArrayList);
+        }
+        super.onSaveInstanceState(outState);
     }
 
 

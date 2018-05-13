@@ -18,7 +18,7 @@ import com.example.bexuma.apollographqlrailsapponheroku.fragments.PostsListFragm
 import com.example.bexuma.apollographqlrailsapponheroku.models.Post;
 
 public class MainActivity extends AppCompatActivity {
-    public static final String TAG = "MainActivity";
+    public static final String TAG = "PostsListFragment";
 
     private static MainActivity mainActivity;
 
@@ -45,17 +45,21 @@ public class MainActivity extends AppCompatActivity {
         FragmentManager fragmentManager = getSupportFragmentManager();
         Fragment fragmentHolder = fragmentManager.findFragmentById(R.id.fragmentHolder);
 
-        if (fragmentHolder == null) {
-            fragmentHolder = new PostsListFragment();
-            fragmentManager.beginTransaction()
-                    .add(R.id.fragmentHolder, fragmentHolder)
-                    .commit();
+
+        if (savedInstanceState == null) {
+            if (fragmentHolder == null) {
+                fragmentHolder = new PostsListFragment();
+                fragmentManager.beginTransaction()
+                        .add(R.id.fragmentHolder, fragmentHolder)
+                        .commit();
+            }
         }
+
     }
 
 
     public void openPostFragment(Post post) {
-        PostFragment postFragment = PostFragment.newInstance(post.getTitle(), post.getContent());
+        PostFragment postFragment = PostFragment.newInstance(post);
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragmentHolder, postFragment)
                 .addToBackStack(null)

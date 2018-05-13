@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.bexuma.apollographqlrailsapponheroku.R;
+import com.example.bexuma.apollographqlrailsapponheroku.models.Post;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -17,11 +18,10 @@ import com.example.bexuma.apollographqlrailsapponheroku.R;
  * create an instance of this fragment.
  */
 public class PostFragment extends Fragment {
-    private static final String ARG_TITLE = "title";
-    private static final String ARG_CONTENT = "content";
+    private static final String ARG_POST = "post";
 
-    private String title;
-    private String content;
+
+    private Post post;
 
 
     public PostFragment() {
@@ -32,15 +32,13 @@ public class PostFragment extends Fragment {
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @param title   Title.
-     * @param content Content.
+     * @param post   Post.
      * @return A new instance of fragment PostFragment.
      */
-    public static PostFragment newInstance(String title, String content) {
+    public static PostFragment newInstance(Post post) {
         PostFragment fragment = new PostFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_TITLE, title);
-        args.putString(ARG_CONTENT, content);
+        args.putParcelable(ARG_POST, post);
         fragment.setArguments(args);
         return fragment;
     }
@@ -49,8 +47,7 @@ public class PostFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            title = getArguments().getString(ARG_TITLE);
-            content = getArguments().getString(ARG_CONTENT);
+            post = getArguments().getParcelable(ARG_POST);
         }
     }
 
@@ -61,8 +58,8 @@ public class PostFragment extends Fragment {
         TextView titleTextView = v.findViewById(R.id.title);
         TextView contentTextView = v.findViewById(R.id.content);
 
-        titleTextView.setText(title);
-        contentTextView.setText(content);
+        titleTextView.setText(post.getTitle());
+        contentTextView.setText(post.getContent());
         return v;
     }
 
